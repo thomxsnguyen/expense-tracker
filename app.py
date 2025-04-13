@@ -43,6 +43,20 @@ def register():
     return jsonify({'message': e}), 402
   
 
+@app.route('/login', methods=['POST'])
+def login():
+  data = request.get_json()
+  username = data.get('username')
+  password = data.get('password')
+
+  if username == USER['username'] and password == USER['password']:
+    token = jwt.encode({'user': username}, app.config['SECRET_KEY'], algorithim="HS256")
+    return jsonify({'token': token}), 200
+  return jsonify({'message': 'invalid credentials'}), 402
+
+
+  
+
 
 
 
