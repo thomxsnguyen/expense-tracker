@@ -6,7 +6,6 @@ import jwt
 
 # token = jwt.encode({'user': username}, app.config['SECRET_KEY'], algorithm="HS256")
 
-USER = {'user': "", 'password': ''}
 
 app = Flask(__name__)
 
@@ -21,7 +20,12 @@ class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   username = db.Column(db.String(80), nullable=False)
   password_hash = db.Column(db.String(128), nullable=False)
-  expenses = db.relationship('Expenses', backref="user", lazy=True)
+  expenses = db.relationship('Expense', backref="user", lazy=True)
+
+  def view(self):
+    return self.username, self.password_hash
+  
+
   
 class Expense(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -42,28 +46,49 @@ def register():
   try:
     data = request.get_json()
     username = data.get('user')
-    password = data.get('password')
+    password = generate_password_hash(data.get('password'))
 
+    user = User(username=username)
+    user.password = password
+
+    db.session.commit()
     
     return jsonify({'message': 'created'}), 200
   except Exception as e:
-    return jsonify({'error': e}), 402
+    return jsonify({'error': str(e)}), 402
   
 
 @app.route('/login', methods=['POST'])
 def login():
+  data = request.get_json()
+  username = data.get('username')
+  password = data.get('password')
+
+  user = User.query.filter_by(username=username).first()
+
+  if user.password == password:
+    token = jwt.encode({'user': username}, app.config['SECRET_KEY'], algorithim="HS256")
+    return jsonify({"token": token}), 200
+  
+  return jsonify({"error": "invalid credentials"}), 401
+
+@app.route('/expense', methods=['POST'])
+def create_expense():
+  header = request.headers.get('Authorization')
+
+  if not header:
+    return jsonify({"message": "header is missing"}), 401
+  
   try:
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-
-    if username == USER['username'] and password == USER['password']:
-      token = jwt.encode({'user': username}, app.config['SECRET_KEY'], algorithim="HS256")
-      return jsonify({'token': token}), 200
-    return jsonify({'message': 'invalid credentials'}), 402
+    token = header.split(" ")[1]
   except Exception as e:
-    return jsonify({'error': e})
-
+    return jsonify({"error": str(e)})
+  
+  try:
+    data = jwt.decode(token, app.config['SECRET_KEY'],  algorithms=['HS256'])
+    return jsonify({"data": data}), 200
+  except Exception as e:
+    return jsonify({'error': str(e)}), 401
 
   
 
