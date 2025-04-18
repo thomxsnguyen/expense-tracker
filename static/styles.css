@@ -1,0 +1,13 @@
+#register-view {
+  display: flex;
+  flex-direction: column;
+}
+
+#login-view {
+  display: none;
+}
+
+.vertical-flex {
+  display: flex;
+  flex-direction: column;
+}

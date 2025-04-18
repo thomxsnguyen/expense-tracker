@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="expense-tracker" content="track your expenses" />
+    <title>Expense Tracker</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+  </head>
+  <header><h1>Expense Tracker</h1></header>
+  <div class="button-group">
+    <button id="register">Register</button>
+    <button id="login">Login</button>
+  </div>
+  <div id="register-view">
+    <div>
+      <label for="username">Enter your new username</label>
+      <input type="text" id="username" name="username" />
+    </div>
+    <div>
+      <label for="password">Enter your new password</label>
+      <input type="text" id="password" name="password" />
+    </div>
+  </div>
+
+  <div id="login-view">
+    <div>
+      <label for="username">Enter your username</label>
+      <input type="text" id="username" name="username" />
+    </div>
+    <div>
+      <label for="password">Enter your password</label>
+      <input type="text" id="password" name="password" />
+    </div>
+  </div>
+</html>
