@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
 
 import jwt
 
@@ -33,6 +34,7 @@ class Expense(db.Model):
   description = db.Column(db.String(1000), nullable=False)
   price = db.Column(db.Float, nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+  date = db.Column(db.DateTime, default=datetime.utcnow)
 
   user = db.relationship('User', back_populates='expenses')
 
@@ -84,16 +86,17 @@ def create_expense():
   data =  request.get_json()
 
   username = profile['user']
+
   description = data.get('description')
   category = data.get('category')
   price = data.get('price')
-
-  user = db.session.query(User).filter_by(username=username).first()
-  new_expense = Expense(description=description, category=category, price=price, user=user)
-  db.session.add(new_expense)
-  db.session.commit()
-
-  return jsonify({"message": "expense added"}), 200
+  if description and category and price:
+    user = db.session.query(User).filter_by(username=username).first()
+    new_expense = Expense(description=description, category=category, price=price, user=user)
+    db.session.add(new_expense)
+    db.session.commit()
+    return jsonify({"message": "expense added"}), 200
+  return jsonify({"message": "invalid body request"}), 401
 
 @app.route('/view', methods=['GET'])
 def view():
