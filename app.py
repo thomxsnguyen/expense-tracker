@@ -24,18 +24,13 @@ class User(db.Model):
 
   def view(self):
     return self.username, self.password_hash
-  
 
-  
 class Expense(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   category = db.Column(db.String(50), nullable=False)
-  description = db.Column(db.String(100), nullable=False)
+  description = db.Column(db.String(1000), nullable=False)
   price = db.Column(db.Float, nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
-
-
 
 @app.route('/')
 def home():
@@ -46,11 +41,12 @@ def register():
   try:
     data = request.get_json()
     username = data.get('user')
-    password = generate_password_hash(data.get('password'))
+    password = data.get('password')
+    hash_password = generate_password_hash(data.get('password'))
+    print(password)
 
-    user = User(username=username)
-    user.password = password
-
+    user = User(username=username, password_hash=hash_password)
+    db.session.add(user)
     db.session.commit()
     
     return jsonify({'message': 'created'}), 200
@@ -67,13 +63,21 @@ def login():
   user = User.query.filter_by(username=username).first()
 
   if user.password == password:
-    token = jwt.encode({'user': username}, app.config['SECRET_KEY'], algorithim="HS256")
+    token = jwt.encode({'user': username}, app.config['SECRET_KEY'], algorithm="HS256")
     return jsonify({"token": token}), 200
   
   return jsonify({"error": "invalid credentials"}), 401
 
+
 @app.route('/expense', methods=['POST'])
 def create_expense():
+  token = get_token()
+  user_id = token['user_id']
+  user = db.session.query(User).filter_by(id=user_id).first()
+  return jsonify({"user": user.id}), 200
+
+  
+def get_token():
   header = request.headers.get('Authorization')
 
   if not header:
@@ -89,7 +93,6 @@ def create_expense():
     return jsonify({"data": data}), 200
   except Exception as e:
     return jsonify({'error': str(e)}), 401
-
   
 
 
