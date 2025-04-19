@@ -77,4 +77,18 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("ERROR:", err);
       });
   });
+
+  const addExp = document.getElementById("create-expense");
+  addExp.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    // const token = localStorage.getItem("token");
+    // fetch("http://127.0.0.1:5000/expense", {
+    //   method: "GET",
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //     "Content-Type": "application/json",
+    //   },
+    // }).then(((response) => response.json()).then((data) => console.log(data)));
+  });
 });
