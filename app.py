@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import jwt
 
@@ -35,7 +35,7 @@ class Expense(db.Model):
   description = db.Column(db.String(1000), nullable=False)
   price = db.Column(db.Float, nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-  date = db.Column(db.DateTime, default=datetime.utcnow)
+  date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
   user = db.relationship('User', back_populates='expenses')
 
@@ -100,13 +100,42 @@ def create_expense():
     return jsonify({"message": "expense added"}), 200
   return jsonify({"message": "invalid body request"}), 401
 
-@app.route('/view', methods=['GET'])
+@app.route('/expenses', methods=['GET'])
 def view():
   profile = get_user_data()
-  username = profile['user']
-  user = User.query.filter_by(username=username).first()
-  expenses = [expense.to_dict() for expense in user.expenses]
-  return jsonify({"message": expenses}), 200
+  
+  filter_type = request.args.get('filter')
+  start_date = request.args.get('start')
+  end_date = request.args.get('end')
+
+  today = datetime.now(timezone.utc)
+
+  if filter_type == "week":
+    from_date = today - timedelta(days=7)
+    to_date = today
+  elif filter_type == "month":
+    from_date = today - timedelta(days=30)
+    to_date = today
+  elif filter_type == "3months":
+    from_date = today - timedelta(days=90)
+    to_date = today
+  elif filter_type == "custom":
+    pass
+  else:
+    return jsonify({'ERROR': 'Invalid filter option'}), 400
+  
+  expenses = Expense.query.filter(
+    Expense.user_id == profile.id,
+    Expense.date >= from_date,
+    Expense.date <= to_date
+  ).all()
+
+  return jsonify([expense.to_dict() for expense in expenses]), 200
+
+  # username = profile['user']
+  # user = User.query.filter_by(username=username).first()
+  # expenses = [expense.to_dict() for expense in user.expenses]
+  # return jsonify({"message": expenses}), 200
 
 def get_user_data():
   header = request.headers.get('Authorization')
