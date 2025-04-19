@@ -72,14 +72,15 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".button-expenses").forEach((el) => {
           el.classList.toggle("hidden");
         });
+        console.log(token);
       })
       .catch((err) => {
         console.error("ERROR:", err);
       });
   });
 
-  const addExp = document.getElementById("create-expense");
-  addExp.addEventListener("click", function (event) {
+  const createOP = document.getElementById("create-expense");
+  createOP.addEventListener("click", function (event) {
     event.preventDefault();
     document.querySelectorAll(".button-expenses").forEach((el) => {
       el.classList.toggle("hidden");
@@ -87,21 +88,28 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".create-expense").forEach((el) => {
       el.classList.toggle("hidden");
     });
+  });
 
-    // const description = document.getElementById("description").value;
-    // const category = document.getElementById("category").value;
-    // const price = document.getElementById("price").value;
+  const addExp = document.getElementById("add-expense");
+  addExp.addEventListener("click", function (event) {
+    event.preventDefault();
+    const description = document.getElementById("description").value;
+    const category = document.getElementById("category").value;
+    const price = document.getElementById("price").value;
 
-    // const body = { description: description, category: category, price: price };
+    const body = { description: description, category: category, price: price };
 
-    // const token = localStorage.getItem("token");
-    // fetch("http://127.0.0.1:5000/expense", {
-    //   method: "GET",
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //     "Content-Type": "application/json",
-    //     body: JSON.stringify(body),
-    //   },
-    // }).then(((response) => response.json()).then((data) => console.log(data)));
+    const token = localStorage.getItem("token");
+    //console.log(token);
+    fetch("http://127.0.0.1:5000/expense", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data));
   });
 });
