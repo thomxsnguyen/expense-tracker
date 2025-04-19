@@ -7,7 +7,15 @@
   display: none;
 }
 
+#login_account {
+  display: none;
+}
+
 .vertical-flex {
   display: flex;
   flex-direction: column;
+}
+
+.hidden {
+  display: none !important;
 }

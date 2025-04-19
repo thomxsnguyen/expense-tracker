@@ -10,6 +10,7 @@ import jwt
 
 #eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidGhvbXhzbmd1eWVuIn0.ZC6kmDkWC2YEcD7aVRORiRCifJ9t5el_91Mohj9kyw8"
 
+#audge, #missaudreychang
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'super_secret_key' 
@@ -68,8 +69,9 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
   profile = request.get_json()
-  username = profile.get('username')
+  username = profile.get('user')
   password = profile.get('password')
+  print(username, password)
 
   user = User.query.filter_by(username=username).first()
 
