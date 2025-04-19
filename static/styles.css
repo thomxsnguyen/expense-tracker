@@ -19,3 +19,8 @@
 .hidden {
   display: none !important;
 }
+
+.create-expense {
+  display: flex;
+  flex-direction: column;
+}

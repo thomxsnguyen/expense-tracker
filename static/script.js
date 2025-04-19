@@ -81,6 +81,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const addExp = document.getElementById("create-expense");
   addExp.addEventListener("click", function (event) {
     event.preventDefault();
+    document.querySelectorAll(".button-expenses").forEach((el) => {
+      el.classList.toggle("hidden");
+    });
+    document.querySelectorAll(".create-expense").forEach((el) => {
+      el.classList.toggle("hidden");
+    });
+
+    // const description = document.getElementById("description").value;
+    // const category = document.getElementById("category").value;
+    // const price = document.getElementById("price").value;
+
+    // const body = { description: description, category: category, price: price };
 
     // const token = localStorage.getItem("token");
     // fetch("http://127.0.0.1:5000/expense", {
@@ -88,6 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //   headers: {
     //     Authorization: `Bearer ${token}`,
     //     "Content-Type": "application/json",
+    //     body: JSON.stringify(body),
     //   },
     // }).then(((response) => response.json()).then((data) => console.log(data)));
   });
